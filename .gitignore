@@ -20,7 +20,6 @@ dist/
 *.swo
 
 # Application specific
-uploaded_files/
 *.log
 .coverage
 htmlcov/
