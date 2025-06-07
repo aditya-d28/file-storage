@@ -1,9 +1,10 @@
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import app.repository.file_metadata_repository as repo
 import pytest
-from app.entity.file_metadata import FileMetadata
 from sqlalchemy.exc import SQLAlchemyError
+
+import app.repository.file_metadata_repository as repo
+from app.entity.file_metadata import FileMetadata
 
 
 @pytest.fixture

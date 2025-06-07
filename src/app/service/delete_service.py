@@ -1,6 +1,9 @@
 import os
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.core.config import settings
+from app.core.logging.logger import get_logger
 from app.core.storage.storage_factory import StorageFactory
 from app.model.enum import DeleteFileEnum
 from app.repository.file_metadata_repository import (
@@ -8,8 +11,6 @@ from app.repository.file_metadata_repository import (
     get_file_by_name_and_destination_for_hard_delete,
     update,
 )
-from shared.logging.logger import get_logger
-from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = get_logger(__name__)
 

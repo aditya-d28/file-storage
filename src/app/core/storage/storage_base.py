@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 
-from app.model.upload_model import StorageUploadResponseModel
 from fastapi import UploadFile
+
+from app.model.upload_model import StorageUploadResponseModel
 
 
 class StorageBase(ABC):

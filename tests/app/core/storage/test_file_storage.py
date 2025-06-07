@@ -2,9 +2,10 @@ import os
 from unittest import mock
 
 import pytest
+from fastapi import UploadFile
+
 from app.core.storage.file_storage import FileStorage
 from app.model.upload_model import StorageUploadResponseModel
-from fastapi import UploadFile
 
 
 @pytest.fixture

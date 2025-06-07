@@ -1,9 +1,10 @@
 from unittest import mock
 
 import pytest
+from fastapi import HTTPException, status
+
 from app.api.routes.delete import delete_file
 from app.model.enum import DeleteFileEnum
-from fastapi import HTTPException, status
 
 
 @pytest.mark.asyncio

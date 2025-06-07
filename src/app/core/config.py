@@ -47,20 +47,12 @@ class Settings(BaseSettings):
             return f"sqlite+aiosqlite:///{self.DB_NAME}"
 
         if self.DB_TYPE == "postgresql":
-            print(
-                f"Using PostgreSQL database:"
-                f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}"
-                f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
-            )
             return (
-                f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}"
-                f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+                f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
             )
 
         if self.DB_TYPE == "mysql":
-            return (
-                f"mysql+aiomysql://{self.DB_USER}:{self.DB_PASSWORD}" f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
-            )
+            return f"mysql+aiomysql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
     @property
     def ALLOWED_ORIGINS_LIST(self) -> list[str]:

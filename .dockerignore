@@ -5,7 +5,6 @@
 *$py.class
 *.so
 .Python
-.env
 .venv
 env/
 venv/

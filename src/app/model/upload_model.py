@@ -1,5 +1,6 @@
-from app.model.file_storage_base_model import FileStorageBaseModel
 from pydantic import Field
+
+from app.model.file_storage_base_model import FileStorageBaseModel
 
 
 class StorageUploadResponseModel(FileStorageBaseModel):

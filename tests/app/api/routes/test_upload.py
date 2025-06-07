@@ -1,10 +1,11 @@
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from app.api.routes.upload import router
-from app.model.upload_model import FileDetailsModel
 from fastapi import FastAPI, status
 from fastapi.testclient import TestClient
+
+from app.api.routes.upload import router
+from app.model.upload_model import FileDetailsModel
 
 app = FastAPI()
 app.include_router(router)

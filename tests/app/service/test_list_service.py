@@ -1,8 +1,9 @@
 from datetime import datetime
 from unittest import mock
 
-import app.service.list_service as list_service
 import pytest
+
+import app.service.list_service as list_service
 
 
 @pytest.fixture

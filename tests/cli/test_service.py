@@ -2,8 +2,9 @@ import json
 import platform
 from unittest import mock
 
-import cli.service as service
 import pytest
+
+import cli.service as service
 
 
 @pytest.fixture
@@ -67,10 +68,8 @@ def test_get_api_url_with_host_port(temp_config_file):
 
 def test_get_api_url_no_config(monkeypatch, tmp_path):
     config_path = tmp_path / "no_config.json"
-    with mock.patch.object(service.logger, "debug") as mock_debug:
-        url = service.get_api_url(str(config_path))
-        assert url == service.API_URL
-        mock_debug.assert_called()
+    url = service.get_api_url(str(config_path))
+    assert url == service.API_URL
 
 
 @mock.patch("cli.service.requests.post")

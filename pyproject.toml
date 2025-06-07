@@ -1,12 +1,11 @@
 [tool.poetry]
 name = "file-storage"
 version = "0.1.0"
-description = ""
+description = "A Python-based file storage service with FastAPI, CLI, and cloud storage support."
 authors = ["aditya-d28 <adiitkgp28@gmail.com>"]
 readme = "README.md"
 packages = [
-  { include = "app", from = "src" },
-  { include = "cli", from = "src" }
+  { include = "cli", from = "src" },
 ]
 
 [tool.poetry.dependencies]
@@ -29,6 +28,7 @@ psycopg2-binary = "^2.9.10"
 boto3 = "^1.38.29"
 httpx = "^0.28.1"
 google-cloud-storage = "^2.18.0"
+python-dotenv = "^1.1.0"
 
 [tool.poetry.group.dev.dependencies]
 alembic = "^1.16.1"
@@ -36,10 +36,10 @@ pytest = "^8.4.0"
 pytest-asyncio = "^1.0.0"
 pytest-mock = "^3.14.1"
 pytest-cov = "^6.1.1"
+ruff = "^0.11.13"
 
 [tool.poetry.scripts]
 fs-store = "cli.main:app"
-fs-store-up = "app.main:run_backend()"
 
 [build-system]
 requires = ["poetry-core"]

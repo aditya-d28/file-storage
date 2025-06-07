@@ -1,11 +1,11 @@
-import uvicorn
-from app.api.main import api_router
-from app.core.config import settings
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from fastapi.routing import APIRoute
-from shared.logging.logger import get_logger, setup_logger
 from starlette.middleware.cors import CORSMiddleware
+
+from app.api.main import api_router
+from app.core.config import settings
+from app.core.logging.logger import get_logger, setup_logger
 
 setup_logger()
 logger = get_logger("system")
@@ -48,16 +48,3 @@ if settings.ALLOWED_ORIGINS_LIST:
     )
 
 app.include_router(api_router)
-
-
-def run_backend(
-    host: str = "localhost",
-    port: int = 8080,
-    reload: bool = True,
-):
-    uvicorn.run(
-        "app.main:app",
-        host=host,
-        port=port,
-        reload=reload,
-    )

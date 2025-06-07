@@ -1,9 +1,10 @@
 from unittest import mock
 
 import pytest
-from app.api.routes import list as list_route
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+
+from app.api.routes import list as list_route
 
 
 @pytest.fixture

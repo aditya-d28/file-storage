@@ -1,11 +1,12 @@
 from typing import Optional
 
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Path, UploadFile
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.core.database.db_config import get_db
+from app.core.logging.logger import get_logger
 from app.model.upload_model import FileDetailsModel
 from app.service.upload_service import upload_file_to_storage
-from fastapi import APIRouter, Depends, File, Form, HTTPException, Path, UploadFile
-from shared.logging.logger import get_logger
-from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter()
 logger = get_logger("system")

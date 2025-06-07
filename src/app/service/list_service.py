@@ -1,6 +1,6 @@
+from app.core.logging.logger import get_logger
 from app.model.upload_model import FileDetailsModel, FileDetailsVerboseModel
 from app.repository.file_metadata_repository import get_list
-from shared.logging.logger import get_logger
 
 logger = get_logger(__name__)
 

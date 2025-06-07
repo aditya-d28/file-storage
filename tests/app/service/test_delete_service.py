@@ -1,7 +1,8 @@
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import app.service.delete_service as delete_service
 import pytest
+
+import app.service.delete_service as delete_service
 from app.model.enum import DeleteFileEnum
 
 

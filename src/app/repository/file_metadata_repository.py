@@ -1,8 +1,9 @@
-from app.entity.file_metadata import FileMetadata
-from shared.logging.logger import get_logger
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+
+from app.core.logging.logger import get_logger
+from app.entity.file_metadata import FileMetadata
 
 logger = get_logger(__name__)
 

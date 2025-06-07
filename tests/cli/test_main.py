@@ -3,8 +3,9 @@ from unittest import mock
 
 import pytest
 import typer
-from cli import main
 from typer.testing import CliRunner
+
+from cli import main
 
 runner = CliRunner()
 
@@ -38,7 +39,7 @@ def test_set_config_host_port(monkeypatch):
     with mock.patch("cli.main.save_config") as save_config:
         result = runner.invoke(main.app, ["set-config", "--host", "127.0.0.1", "--port", "9000"])
         assert result.exit_code == 0
-        assert "Backend server configured to run on 127.0.0.1:9000." in result.output
+        assert "Backend host and port set to 127.0.0.1:9000." in result.output
         save_config.assert_called()
 
 
@@ -72,23 +73,6 @@ def test_get_config_api_url_and_host_port(tmp_path, monkeypatch):
     result = runner.invoke(main.app, ["get-config"])
     assert "API URL: http://api" in result.output
     assert "Host: h, Port: 1234" in result.output
-
-
-def test_run_reads_config_and_calls_backend(monkeypatch, tmp_path):
-    config = {"host": "h", "port": 1234}
-    config_path = tmp_path / "config.json"
-    config_path.write_text(json.dumps(config))
-    monkeypatch.setattr(main, "CONFIG_PATH", str(config_path))
-    called = {}
-
-    def fake_run_backend(host, port, reload):
-        called.update(dict(host=host, port=port, reload=reload))
-
-    monkeypatch.setattr(main, "run_backend", fake_run_backend)
-    runner.invoke(main.app, ["run"])
-    assert called["host"] == "h"
-    assert called["port"] == 1234
-    assert called["reload"] is False
 
 
 def test_upload_file_success(monkeypatch, tmp_path):

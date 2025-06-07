@@ -1,8 +1,9 @@
 from unittest import mock
 
 import pytest
-from app.core.database import db_config
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.database import db_config
 
 
 @pytest.fixture

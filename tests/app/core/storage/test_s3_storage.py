@@ -1,10 +1,11 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from app.core.storage.s3_storage import S3Storage
-from app.model.upload_model import StorageUploadResponseModel
 from botocore.exceptions import ClientError
 from fastapi import UploadFile
+
+from app.core.storage.s3_storage import S3Storage
+from app.model.upload_model import StorageUploadResponseModel
 
 
 @pytest.fixture

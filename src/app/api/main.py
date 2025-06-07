@@ -1,5 +1,6 @@
-from app.api.routes import delete, list, upload
 from fastapi import APIRouter
+
+from app.api.routes import delete, list, upload
 
 api_router = APIRouter()
 

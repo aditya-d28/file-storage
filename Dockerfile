@@ -38,6 +38,9 @@ RUN poetry config virtualenvs.create false \
 # Copy application code
 COPY . .
 
+# Copy the package distribution files
+COPY ./dist ./dist
+
 # Expose the port the app runs on
 EXPOSE 8000
 

@@ -4,9 +4,7 @@ import os
 from pathlib import Path
 
 import typer
-from app.main import run_backend
 from rich import print
-from shared.logging.logger import get_logger
 
 from . import __version__
 from .service import (
@@ -17,8 +15,6 @@ from .service import (
     save_config,
     upload_file_to_storage,
 )
-
-logger = get_logger(__name__)
 
 app = typer.Typer(rich_markup_mode="rich")
 
@@ -96,7 +92,7 @@ def set_config(
     if api_url:
         print(f"[green]Backend API endpoint set to {api_url}.[/green]")
     elif host and port:
-        print(f"[green]Backend server configured to run on [bold]{host}:{port}[/bold].[/green]")
+        print(f"[green]Backend host and port set to [bold]{host}:{port}[/bold].[/green]")
     elif clear:
         if os.path.exists(CONFIG_PATH):
             os.remove(CONFIG_PATH)
@@ -139,40 +135,6 @@ def get_config() -> None:
         print("[bold yellow]No API URL or host/port configuration found.[/bold yellow]")
 
     print("[yellow]-- To set/update the configuration, use [bold]'set-config'[/bold].[/yellow]")
-    if "host" in config or "port" in config:
-        print("[yellow]-- To run the server, use [bold]'run'[/bold].[/yellow]")
-
-
-@app.command("run")
-def run(
-    host: str = typer.Option(None, "--host", "-h", help="Host to run the backend server on"),
-    port: int = typer.Option(None, "--port", "-p", help="Port to run the backend server on"),
-    reload: bool = typer.Option(False, "--reload", "-r", help="Enable auto-reload for development"),
-) -> None:
-    """
-    Starts the backend server with the specified host, port, and reload options.
-
-    Parameters:
-        host (str, optional): Host address to run the backend server on. If not provided, uses the value from the config file or defaults to "localhost".
-        port (int, optional): Port number to run the backend server on. If not provided, uses the value from the config file or defaults to 8080.
-        reload (bool, optional): If True, enables auto-reload for development. Defaults to False.
-
-    Reads configuration from CONFIG_PATH if available, and overrides with command-line options if provided.
-    """
-
-    server_host = "localhost"
-    server_port = 8080
-
-    with open(CONFIG_PATH, "r") as f:
-        config = json.load(f)
-    if "host" in config and "port" in config:
-        server_host = config["host"] or server_host
-        server_port = config["port"] or server_port
-
-    server_host = host or server_host
-    server_port = port or server_port
-
-    run_backend(server_host, server_port, reload=reload)
 
 
 @app.command("upload-file")
@@ -218,7 +180,7 @@ def upload_file(
     """
 
     api_url_for_call = api_url or get_api_url(CONFIG_PATH)
-    logger.debug(f"Using the API URL: {api_url_for_call}")
+    print(f"Using the API URL: {api_url_for_call}")
     try:
         response = upload_file_to_storage(
             api_url=api_url_for_call,
@@ -269,7 +231,7 @@ def delete_file(
     """
 
     api_url_for_call = api_url or get_api_url(CONFIG_PATH)
-    logger.debug(f"Using the API URL: {api_url_for_call}")
+    print(f"Using the API URL: {api_url_for_call}")
     if delete_permanently:
         print(
             f"[bold red]Are you sure you want to permanently delete the file '{destination}/{name}'? This action cannot be undone.[/bold red]"
@@ -336,7 +298,7 @@ def list_files(
     """
 
     api_url_for_call = api_url or get_api_url(CONFIG_PATH)
-    logger.debug(f"Using the API URL: {api_url_for_call}")
+    print(f"Using the API URL: {api_url_for_call}")
     try:
         response = get_file_list(
             api_url=api_url_for_call,
