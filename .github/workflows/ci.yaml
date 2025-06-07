@@ -1,0 +1,61 @@
+name: Python CI Workflow
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  install-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12'
+
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+
+      - name: Install dependencies
+        run: |
+          poetry install
+
+      - name: Run format check
+        run: |
+          poe format-check
+
+      - name: Run import check
+        run: |
+          poe import-check
+
+      - name: Run whitespace check
+        run: |
+          poe whitespace-check
+
+      - name: Run lint check
+        run: |
+          poe lint-check
+
+      - name: Run unit tests
+        run: |
+          poe unit-tests
+
+      - name: Build the project
+        run: |
+          poetry build
