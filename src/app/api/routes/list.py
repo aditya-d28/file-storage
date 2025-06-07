@@ -1,7 +1,7 @@
 from app.core.database.db_config import get_db
 from app.model.upload_model import FileDetailsModel, FileDetailsVerboseModel
 from app.service.list_service import get_file_list
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from shared.logging.logger import get_logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,21 +11,21 @@ logger = get_logger(__name__)
 
 @router.get("/files", summary="Lists all files in the file-storage server.")
 async def list_files(
-    order_by_name: bool = Query(False, description="Sort files by name"),
-    order_by_updated_at: bool = Query(False, description="Sort files by date"),
-    order_by_size: bool = Query(False, description="Sort files by size"),
+    order_by_name: bool = Query(False, description="Sort files by name (a -> z)"),
+    order_by_updated_at: bool = Query(False, description="Sort files by date (recently updated first)"),
+    order_by_size: bool = Query(False, description="Sort files by size (smallest first)"),
     destination: str = Query("", description="Directory to list files from"),
     tag: str = Query("", description="Filter files by tag"),
     verbose: bool = Query(False, description="Include version information"),
     db: AsyncSession = Depends(get_db),
-) -> list[FileDetailsModel] | list[FileDetailsVerboseModel] | dict:
+) -> list[FileDetailsModel] | list[FileDetailsVerboseModel]:
     """
     Lists all files in the storage server, with optional filtering and sorting.
 
     Args:
-        order_by_name (bool): Sort files by name if True.
-        order_by_updated_at (bool): Sort files by last update date if True.
-        order_by_size (bool): Sort files by size if True.
+        order_by_name (bool): Sort files by name if True (a -> z).
+        order_by_updated_at (bool): Sort files by last update date if True (recently updated first).
+        order_by_size (bool): Sort files by size if True (smallest first).
         destination (str): Filter files by destination directory.
         tag (str): Filter files by tag.
         verbose (bool): Include additional version information if True.
@@ -55,4 +55,4 @@ async def list_files(
         return files
     except Exception as err:
         logger.error(f"Error retrieving file list: {err}")
-        return {"error": str(err)}
+        raise HTTPException(status_code=500, detail="Error retrieving file list.")

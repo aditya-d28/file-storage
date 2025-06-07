@@ -1,9 +1,8 @@
-import pytest
-import asyncio
-from unittest import mock
 from datetime import datetime
+from unittest import mock
 
 import app.service.list_service as list_service
+import pytest
 
 
 @pytest.fixture
@@ -120,9 +119,7 @@ async def test_get_file_list_with_filters(monkeypatch, fake_file_basic):
 @pytest.mark.asyncio
 async def test_get_file_list_exception(monkeypatch):
     mock_db = mock.Mock()
-    monkeypatch.setattr(
-        list_service, "get_list", mock.AsyncMock(side_effect=Exception("db error"))
-    )
+    monkeypatch.setattr(list_service, "get_list", mock.AsyncMock(side_effect=Exception("db error")))
     monkeypatch.setattr(list_service.logger, "error", lambda msg: None)
 
     with pytest.raises(Exception) as excinfo:

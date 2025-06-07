@@ -3,7 +3,7 @@ from typing import Optional
 from app.core.database.db_config import get_db
 from app.model.upload_model import FileDetailsModel
 from app.service.upload_service import upload_file_to_storage
-from fastapi import APIRouter, Depends, File, Form, Path, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Path, UploadFile
 from shared.logging.logger import get_logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -19,7 +19,7 @@ async def upload_file(
     tags: Optional[str] = Form("", description="Tags associated with the file"),
     description: Optional[str] = Form("", description="Description of the file"),
     db: AsyncSession = Depends(get_db),
-) -> FileDetailsModel | dict:
+) -> FileDetailsModel:
     """
     Uploads a file to the storage server with the specified metadata.
 
@@ -47,4 +47,4 @@ async def upload_file(
         return file_details
     except Exception as err:
         logger.error(f"Error uploading file: {err}")
-        return {"error": str(err)}
+        raise HTTPException(status_code=500, detail=f"Error uploading file {name}.")

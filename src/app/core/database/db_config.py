@@ -30,9 +30,7 @@ class Database:
             pool_size=int(settings.DB_POOL_SIZE),
             max_overflow=int(settings.DB_MAX_OVERFLOW),
         )
-        self.session_local = sessionmaker(
-            bind=self.engine, class_=AsyncSession, autocommit=False, autoflush=True
-        )
+        self.session_local = sessionmaker(bind=self.engine, class_=AsyncSession, autocommit=False, autoflush=True)
 
     async def get_session(self) -> AsyncGenerator[AsyncSession, None]:
         """

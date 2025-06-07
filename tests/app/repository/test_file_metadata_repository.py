@@ -1,9 +1,9 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-from app.entity.file_metadata import FileMetadata
-from sqlalchemy.exc import SQLAlchemyError
 
 import app.repository.file_metadata_repository as repo
+import pytest
+from app.entity.file_metadata import FileMetadata
+from sqlalchemy.exc import SQLAlchemyError
 
 
 @pytest.fixture
@@ -57,9 +57,7 @@ async def test_insert_sqlalchemy_error(db_session, file_metadata):
 
 @pytest.mark.asyncio
 async def test_delete_found(db_session, file_metadata):
-    db_session.execute = AsyncMock(
-        return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=file_metadata))
-    )
+    db_session.execute = AsyncMock(return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=file_metadata)))
     db_session.delete = AsyncMock()
     db_session.commit = AsyncMock()
     with patch.object(repo.logger, "debug") as mock_log:
@@ -71,10 +69,8 @@ async def test_delete_found(db_session, file_metadata):
 
 @pytest.mark.asyncio
 async def test_delete_not_found(db_session):
-    db_session.execute = AsyncMock(
-        return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=None))
-    )
-    with patch.object(repo.logger, "warning") as mock_log:
+    db_session.execute = AsyncMock(return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=None)))
+    with patch.object(repo.logger, "debug") as mock_log:
         await repo.delete(db_session, "notfound.txt")
         mock_log.assert_called()
 
@@ -94,9 +90,7 @@ async def test_delete_sqlalchemy_error(db_session):
 async def test_get_file_by_name_found(db_session, file_metadata):
     mock_scalars = MagicMock()
     mock_scalars.all.return_value = [file_metadata]
-    db_session.execute = AsyncMock(
-        return_value=MagicMock(scalars=MagicMock(return_value=mock_scalars))
-    )
+    db_session.execute = AsyncMock(return_value=MagicMock(scalars=MagicMock(return_value=mock_scalars)))
     with patch.object(repo.logger, "debug") as mock_log:
         result = await repo.get_file_by_name(db_session, "test.txt")
         assert result == [file_metadata]
@@ -107,10 +101,8 @@ async def test_get_file_by_name_found(db_session, file_metadata):
 async def test_get_file_by_name_not_found(db_session):
     mock_scalars = MagicMock()
     mock_scalars.all.return_value = []
-    db_session.execute = AsyncMock(
-        return_value=MagicMock(scalars=MagicMock(return_value=mock_scalars))
-    )
-    with patch.object(repo.logger, "warning") as mock_log:
+    db_session.execute = AsyncMock(return_value=MagicMock(scalars=MagicMock(return_value=mock_scalars)))
+    with patch.object(repo.logger, "debug") as mock_log:
         result = await repo.get_file_by_name(db_session, "notfound.txt")
         assert result == []
         mock_log.assert_called()
@@ -127,26 +119,18 @@ async def test_get_file_by_name_sqlalchemy_error(db_session):
 
 @pytest.mark.asyncio
 async def test_get_file_by_name_and_destination_found(db_session, file_metadata):
-    db_session.execute = AsyncMock(
-        return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=file_metadata))
-    )
+    db_session.execute = AsyncMock(return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=file_metadata)))
     with patch.object(repo.logger, "debug") as mock_log:
-        result = await repo.get_file_by_name_and_destination(
-            db_session, "test.txt", "folder"
-        )
+        result = await repo.get_file_by_name_and_destination(db_session, "test.txt", "folder")
         assert result == file_metadata
         mock_log.assert_called()
 
 
 @pytest.mark.asyncio
 async def test_get_file_by_name_and_destination_not_found(db_session):
-    db_session.execute = AsyncMock(
-        return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=None))
-    )
-    with patch.object(repo.logger, "warning") as mock_log:
-        result = await repo.get_file_by_name_and_destination(
-            db_session, "notfound.txt", "folder"
-        )
+    db_session.execute = AsyncMock(return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=None)))
+    with patch.object(repo.logger, "debug") as mock_log:
+        result = await repo.get_file_by_name_and_destination(db_session, "notfound.txt", "folder")
         assert result is None
         mock_log.assert_called()
 
@@ -156,36 +140,24 @@ async def test_get_file_by_name_and_destination_sqlalchemy_error(db_session):
     db_session.execute = AsyncMock(side_effect=SQLAlchemyError("fail"))
     with patch.object(repo.logger, "error") as mock_log:
         with pytest.raises(SQLAlchemyError):
-            await repo.get_file_by_name_and_destination(
-                db_session, "test.txt", "folder"
-            )
+            await repo.get_file_by_name_and_destination(db_session, "test.txt", "folder")
         mock_log.assert_called()
 
 
 @pytest.mark.asyncio
-async def test_get_file_by_name_and_destination_for_hard_delete_found(
-    db_session, file_metadata
-):
-    db_session.execute = AsyncMock(
-        return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=file_metadata))
-    )
+async def test_get_file_by_name_and_destination_for_hard_delete_found(db_session, file_metadata):
+    db_session.execute = AsyncMock(return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=file_metadata)))
     with patch.object(repo.logger, "debug") as mock_log:
-        result = await repo.get_file_by_name_and_destination_for_hard_delete(
-            db_session, "test.txt", "folder"
-        )
+        result = await repo.get_file_by_name_and_destination_for_hard_delete(db_session, "test.txt", "folder")
         assert result == file_metadata
         mock_log.assert_called()
 
 
 @pytest.mark.asyncio
 async def test_get_file_by_name_and_destination_for_hard_delete_not_found(db_session):
-    db_session.execute = AsyncMock(
-        return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=None))
-    )
-    with patch.object(repo.logger, "warning") as mock_log:
-        result = await repo.get_file_by_name_and_destination_for_hard_delete(
-            db_session, "notfound.txt", "folder"
-        )
+    db_session.execute = AsyncMock(return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=None)))
+    with patch.object(repo.logger, "debug") as mock_log:
+        result = await repo.get_file_by_name_and_destination_for_hard_delete(db_session, "notfound.txt", "folder")
         assert result is None
         mock_log.assert_called()
 
@@ -197,9 +169,7 @@ async def test_get_file_by_name_and_destination_for_hard_delete_sqlalchemy_error
     db_session.execute = AsyncMock(side_effect=SQLAlchemyError("fail"))
     with patch.object(repo.logger, "error") as mock_log:
         with pytest.raises(SQLAlchemyError):
-            await repo.get_file_by_name_and_destination_for_hard_delete(
-                db_session, "test.txt", "folder"
-            )
+            await repo.get_file_by_name_and_destination_for_hard_delete(db_session, "test.txt", "folder")
         mock_log.assert_called()
 
 
@@ -232,9 +202,7 @@ async def test_update_sqlalchemy_error(db_session, file_metadata):
 async def test_get_list_basic(db_session, file_metadata):
     mock_scalars = MagicMock()
     mock_scalars.all.return_value = [file_metadata]
-    db_session.execute = AsyncMock(
-        return_value=MagicMock(scalars=MagicMock(return_value=mock_scalars))
-    )
+    db_session.execute = AsyncMock(return_value=MagicMock(scalars=MagicMock(return_value=mock_scalars)))
     with patch.object(repo.logger, "debug") as mock_log:
         result = await repo.get_list(db_session)
         assert result == [file_metadata]
@@ -258,9 +226,7 @@ async def test_get_list_order_by_name(db_session):
 
     mock_scalars = MagicMock()
     mock_scalars.all.return_value = [file2, file1]  # Sorted by name
-    db_session.execute = AsyncMock(
-        return_value=MagicMock(scalars=MagicMock(return_value=mock_scalars))
-    )
+    db_session.execute = AsyncMock(return_value=MagicMock(scalars=MagicMock(return_value=mock_scalars)))
 
     result = await repo.get_list(db_session, order_by_name=True)
     assert result == [file2, file1]  # Assert ordered by name
@@ -274,9 +240,7 @@ async def test_get_list_order_by_size(db_session):
 
     mock_scalars = MagicMock()
     mock_scalars.all.return_value = [file2, file1]  # Sorted by size
-    db_session.execute = AsyncMock(
-        return_value=MagicMock(scalars=MagicMock(return_value=mock_scalars))
-    )
+    db_session.execute = AsyncMock(return_value=MagicMock(scalars=MagicMock(return_value=mock_scalars)))
 
     result = await repo.get_list(db_session, order_by_size=True)
     assert result == [file2, file1]  # Assert ordered by size
@@ -290,9 +254,7 @@ async def test_get_list_order_by_updated_at(db_session):
 
     mock_scalars = MagicMock()
     mock_scalars.all.return_value = [file2, file1]  # Sorted by updated_at desc
-    db_session.execute = AsyncMock(
-        return_value=MagicMock(scalars=MagicMock(return_value=mock_scalars))
-    )
+    db_session.execute = AsyncMock(return_value=MagicMock(scalars=MagicMock(return_value=mock_scalars)))
 
     result = await repo.get_list(db_session, order_by_updated_at=True)
     assert result == [file2, file1]  # Assert ordered by updated_at desc
@@ -305,9 +267,7 @@ async def test_get_list_filter_by_tag(db_session):
 
     mock_scalars = MagicMock()
     mock_scalars.all.return_value = [file1]
-    db_session.execute = AsyncMock(
-        return_value=MagicMock(scalars=MagicMock(return_value=mock_scalars))
-    )
+    db_session.execute = AsyncMock(return_value=MagicMock(scalars=MagicMock(return_value=mock_scalars)))
 
     result = await repo.get_list(db_session, tag="tag1")
     assert result == [file1]
@@ -321,9 +281,7 @@ async def test_get_list_filter_by_destination(db_session):
 
     mock_scalars = MagicMock()
     mock_scalars.all.return_value = [file1, file2]
-    db_session.execute = AsyncMock(
-        return_value=MagicMock(scalars=MagicMock(return_value=mock_scalars))
-    )
+    db_session.execute = AsyncMock(return_value=MagicMock(scalars=MagicMock(return_value=mock_scalars)))
 
     result = await repo.get_list(db_session, destination="folder1")
     assert result == [file1, file2]  # Should include both main folder and subfolder

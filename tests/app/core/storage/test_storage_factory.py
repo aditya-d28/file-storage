@@ -1,7 +1,8 @@
-import pytest
 from unittest import mock
-from app.core.storage.storage_factory import StorageFactory
+
+import pytest
 from app.core.storage.storage_base import StorageBase
+from app.core.storage.storage_factory import StorageFactory
 
 
 @pytest.fixture
@@ -43,7 +44,7 @@ def mock_file_storage():
 def test_get_storage_local_returns_filestorage(mock_file_storage):
     mock_file_storage_class, mock_file_storage_instance = mock_file_storage
     storage = StorageFactory.get_storage("local", "testbucket")
-    
+
     mock_file_storage_class.assert_called_once_with(bucket_name="testbucket")
     assert storage == mock_file_storage_instance
     assert isinstance(storage, StorageBase)  # Verify it implements base interface
@@ -64,9 +65,7 @@ def test_get_storage_s3_returns_s3storage(mock_settings, mock_s3_storage):
 
 def test_get_storage_gcs_returns_googlecloudstorage(mock_settings, mock_gcs_storage):
     _ = StorageFactory.get_storage("gcs", "testbucket")
-    mock_gcs_storage.assert_called_once_with(
-        bucket_name="testbucket", location="us-central1"
-    )
+    mock_gcs_storage.assert_called_once_with(bucket_name="testbucket", location="us-central1")
     assert isinstance(mock_gcs_storage.return_value, StorageBase)
 
 

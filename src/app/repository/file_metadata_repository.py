@@ -52,16 +52,14 @@ async def delete(db: AsyncSession, file_name: str) -> None:
     """
 
     try:
-        result = await db.execute(
-            select(FileMetadata).where(FileMetadata.file_name == file_name)
-        )
+        result = await db.execute(select(FileMetadata).where(FileMetadata.file_name == file_name))
         file = result.scalar_one_or_none()
         if file:
             await db.delete(file)
             await db.commit()
             logger.debug(f"Deleted file metadata: {file_name}")
         else:
-            logger.warning(f"File metadata not found for deletion: {file_name}")
+            logger.debug(f"File metadata not found for deletion: {file_name}")
     except SQLAlchemyError as err:
         await db.rollback()
         logger.error(f"SQLAlchemyError: {err}")
@@ -94,16 +92,14 @@ async def get_file_by_name(db: AsyncSession, file_name: str) -> FileMetadata:
         if file_metadata:
             logger.debug(f"Retrieved file metadata: {file_name}")
         else:
-            logger.warning(f"File metadata not found: {file_name}")
+            logger.debug(f"File metadata not found: {file_name}")
         return file_metadata
     except SQLAlchemyError as err:
         logger.error(f"SQLAlchemyError: {err}")
         raise err
 
 
-async def get_file_by_name_and_destination(
-    db: AsyncSession, file_name: str, destination: str
-) -> FileMetadata:
+async def get_file_by_name_and_destination(db: AsyncSession, file_name: str, destination: str) -> FileMetadata:
     """
     Asynchronously retrieves a FileMetadata record from the database by file name and destination.
 
@@ -131,7 +127,7 @@ async def get_file_by_name_and_destination(
         if file_metadata:
             logger.debug(f"Retrieved file metadata: {file_metadata.file_name}")
         else:
-            logger.warning(f"File metadata not found: {file_name} in {destination}")
+            logger.debug(f"File metadata not found: {file_name} in {destination}")
         return file_metadata
     except SQLAlchemyError as err:
         logger.error(f"SQLAlchemyError: {err}")
@@ -167,7 +163,7 @@ async def get_file_by_name_and_destination_for_hard_delete(
         if file_metadata:
             logger.debug(f"Retrieved file metadata: {file_metadata.file_name}")
         else:
-            logger.warning(f"File metadata not found: {file_name} in {destination}")
+            logger.debug(f"File metadata not found: {file_name} in {destination}")
         return file_metadata
     except SQLAlchemyError as err:
         logger.error(f"SQLAlchemyError: {err}")
@@ -244,8 +240,7 @@ async def get_list(
             query = query.where(FileMetadata.tags.contains(tag))
         if destination:
             query = query.where(
-                (FileMetadata.destination == destination)
-                | (FileMetadata.destination.like(f"{destination}/%"))
+                (FileMetadata.destination == destination) | (FileMetadata.destination.like(f"{destination}/%"))
             )
 
         result = await db.execute(query)

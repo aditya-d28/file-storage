@@ -27,9 +27,7 @@ class FileStorage(StorageBase):
             os.makedirs(bucket_name)
             logger.info(f"Base path created: {bucket_name}")
 
-    async def upload(
-        self, name: str, file: UploadFile, destination: str = ""
-    ) -> StorageUploadResponseModel:
+    async def upload(self, name: str, file: UploadFile, destination: str = "") -> StorageUploadResponseModel:
         """
         Asynchronously uploads a file to the local storage.
 
@@ -56,12 +54,8 @@ class FileStorage(StorageBase):
 
             response = StorageUploadResponseModel(
                 file_path=file_path,
-                file_size=file.file_size
-                if hasattr(file, "file_size")
-                else os.path.getsize(file_path),
-                file_type=file.content_type
-                if hasattr(file, "content_type")
-                else "application/octet-stream",
+                file_size=file.file_size if hasattr(file, "file_size") else os.path.getsize(file_path),
+                file_type=file.content_type if hasattr(file, "content_type") else "application/octet-stream",
             )
             return response
         except Exception as err:

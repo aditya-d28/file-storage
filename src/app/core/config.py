@@ -16,9 +16,7 @@ def parse_cors(v: Any) -> list[str] | str:
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_file=env_path, env_ignore_empty=True, extra="ignore"
-    )
+    model_config = SettingsConfigDict(env_file=env_path, env_ignore_empty=True, extra="ignore")
     API_VER_STR: str = "/v1"
     PROJECT_NAME: str
     CONSOLE_LOG_LEVEL: str
@@ -61,8 +59,7 @@ class Settings(BaseSettings):
 
         if self.DB_TYPE == "mysql":
             return (
-                f"mysql+aiomysql://{self.DB_USER}:{self.DB_PASSWORD}"
-                f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+                f"mysql+aiomysql://{self.DB_USER}:{self.DB_PASSWORD}" f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
             )
 
     @property

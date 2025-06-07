@@ -30,9 +30,7 @@ def custom_openapi():
         version="1.0.0",
         openapi_version="3.1.0",
         routes=app.routes,
-        servers=[
-            {"url": "http://localhost:8080", "description": "Local Development server"}
-        ],
+        servers=[{"url": "http://localhost:8080", "description": "Local Development server"}],
     )
     app.openapi_schema = openapi_schema
     return app.openapi_schema
@@ -43,9 +41,7 @@ app.openapi = custom_openapi
 if settings.ALLOWED_ORIGINS_LIST:
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[
-            str(origin).strip("/") for origin in settings.ALLOWED_ORIGINS_LIST
-        ],
+        allow_origins=[str(origin).strip("/") for origin in settings.ALLOWED_ORIGINS_LIST],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

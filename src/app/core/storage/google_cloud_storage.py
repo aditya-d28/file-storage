@@ -20,7 +20,9 @@ class GoogleCloudStorage(StorageBase):
         Raises:
             Exception: If the bucket does not exist and cannot be created.
         """
-        self.client = storage.Client()  # Authentication is handled by the environment variable GOOGLE_APPLICATION_CREDENTIALS
+        self.client = (
+            storage.Client()
+        )  # Authentication is handled by the environment variable GOOGLE_APPLICATION_CREDENTIALS
         try:
             logger.debug(f"Checking if bucket '{bucket_name}' exists.")
             self.bucket = self.client.get_bucket(bucket_name)
@@ -29,9 +31,7 @@ class GoogleCloudStorage(StorageBase):
             try:
                 logger.debug(f"Bucket '{bucket_name}' does not exist. Creating it now.")
                 self.bucket = self.client.create_bucket(bucket_name, location=location)
-                logger.debug(
-                    f"Bucket '{bucket_name}' created in location '{location}'."
-                )
+                logger.debug(f"Bucket '{bucket_name}' created in location '{location}'.")
             except Exception as err:
                 logger.error(f"Error occurred: {err}")
                 raise Exception(f"Failed to create bucket '{bucket_name}': {err}")
@@ -39,9 +39,7 @@ class GoogleCloudStorage(StorageBase):
             logger.error(f"Error occurred: {err}")
             raise Exception(f"Failed to create bucket '{bucket_name}': {err}")
 
-    async def upload(
-        self, name: str, file: UploadFile, destination: str
-    ) -> StorageUploadResponseModel:
+    async def upload(self, name: str, file: UploadFile, destination: str) -> StorageUploadResponseModel:
         """
         Uploads a file to Google Cloud Storage.
 

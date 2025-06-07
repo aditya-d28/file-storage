@@ -1,7 +1,7 @@
 from app.core.database.db_config import get_db
 from app.model.enum import DeleteFileEnum
 from app.service.delete_service import hard_delete_file, soft_delete_file
-from fastapi import APIRouter, Depends, Path, Query
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from shared.logging.logger import get_logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -37,20 +37,20 @@ async def delete_file(
     if delete_permanently:
         response = await hard_delete_file(db, file_name=name, destination=destination)
         if response == DeleteFileEnum.FILE_NOT_FOUND:
-            logger.error(f"File {name} not found.")
-            return {"error": f"File {name} does not exist."}
+            logger.warning(f"File {name} not found.")
+            raise HTTPException(status_code=404, detail=f"File {name} not found.")
         elif response == DeleteFileEnum.ERROR:
             logger.error(f"Error deleting file {name} permanently.")
-            return {"error": f"Error deleting file {name} permanently."}
+            raise HTTPException(status_code=500, detail=f"Error deleting file {name} permanently.")
         logger.info(f"File {name} deleted permanently.")
         return {"message": f"File {name} deleted permanently."}
     else:
         response = await soft_delete_file(db, file_name=name, destination=destination)
         if response == DeleteFileEnum.FILE_NOT_FOUND:
-            logger.error(f"File {name} not found.")
-            return {"error": f"File {name} does not exist."}
+            logger.warning(f"File {name} not found.")
+            raise HTTPException(status_code=404, detail=f"File {name} not found.")
         elif response == DeleteFileEnum.ERROR:
             logger.error(f"Error deleting file {name}.")
-            return {"error": f"Error deleting file {name}."}
+            raise HTTPException(status_code=500, detail=f"Error deleting file {name}.")
         logger.info(f"File {name} deleted.")
         return {"message": f"File {name} deleted."}

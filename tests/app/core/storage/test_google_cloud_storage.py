@@ -1,5 +1,6 @@
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
 from app.core.storage.google_cloud_storage import GoogleCloudStorage
 from app.model.upload_model import StorageUploadResponseModel
 from fastapi import UploadFile
@@ -39,9 +40,7 @@ async def test_upload_file_success(gcs_storage, gcs_client_mock):
     mock_blob = MagicMock()
     gcs_client_mock.bucket.return_value.blob.return_value = mock_blob
     mock_blob.exists.return_value = False
-    mock_blob.public_url = (
-        "https://storage.googleapis.com/test-bucket/test-folder/test.txt"
-    )
+    mock_blob.public_url = "https://storage.googleapis.com/test-bucket/test-folder/test.txt"
     mock_blob.content_type = "text/plain"
     mock_blob.size.return_value = 1234
 
@@ -49,9 +48,7 @@ async def test_upload_file_success(gcs_storage, gcs_client_mock):
     result = await gcs_storage.upload("test.txt", file_mock, "test-folder")
 
     # Assert
-    gcs_client_mock.bucket.return_value.blob.assert_called_once_with(
-        "test-folder/test.txt"
-    )
+    gcs_client_mock.bucket.return_value.blob.assert_called_once_with("test-folder/test.txt")
     assert isinstance(result, StorageUploadResponseModel)
     assert result.file_type == "text/plain"
     assert result.file_path == "gs://test-bucket/test-folder/test.txt"
@@ -69,9 +66,7 @@ async def test_upload_file_error(gcs_storage, gcs_client_mock):
     mock_blob.upload_from_file.side_effect = Exception("Upload failed")
 
     # Act & Assert
-    with pytest.raises(
-        Exception, match="Failed to upload file to Google Cloud Storage"
-    ):
+    with pytest.raises(Exception, match="Failed to upload file to Google Cloud Storage"):
         await gcs_storage.upload("test.txt", file_mock, "test-folder")
 
 
@@ -101,9 +96,7 @@ async def test_delete_file_error(gcs_storage, gcs_client_mock):
     mock_blob.delete.side_effect = Exception("Delete failed")
 
     # Act & Assert
-    with pytest.raises(
-        Exception, match="Failed to delete file from Google Cloud Storage"
-    ):
+    with pytest.raises(Exception, match="Failed to delete file from Google Cloud Storage"):
         await gcs_storage.delete("test.txt", "test-folder")
 
 
@@ -125,9 +118,7 @@ def test_init_create_bucket(gcs_client_mock):
 
     # Assert
     gcs_client_mock.get_bucket.assert_called_once_with("new-bucket")
-    gcs_client_mock.create_bucket.assert_called_once_with(
-        "new-bucket", location="us-central1"
-    )
+    gcs_client_mock.create_bucket.assert_called_once_with("new-bucket", location="us-central1")
 
 
 def test_init_create_bucket_fails(gcs_client_mock):
@@ -140,9 +131,7 @@ def test_init_create_bucket_fails(gcs_client_mock):
         GoogleCloudStorage(bucket_name="failed-bucket", location="us-central1")
 
     gcs_client_mock.get_bucket.assert_called_once_with("failed-bucket")
-    gcs_client_mock.create_bucket.assert_called_once_with(
-        "failed-bucket", location="us-central1"
-    )
+    gcs_client_mock.create_bucket.assert_called_once_with("failed-bucket", location="us-central1")
 
 
 def test_init_general_exception(gcs_client_mock):

@@ -39,11 +39,9 @@ async def soft_delete_file(
     """
 
     try:
-        file_metadata = await get_file_by_name_and_destination(
-            db=db, file_name=file_name, destination=destination
-        )
+        file_metadata = await get_file_by_name_and_destination(db=db, file_name=file_name, destination=destination)
         if not file_metadata:
-            logger.error(f"File {file_name} not found for soft delete.")
+            logger.warning(f"File {file_name} not found for soft delete.")
             return DeleteFileEnum.FILE_NOT_FOUND
 
         file_metadata.is_deleted = True
@@ -79,14 +77,12 @@ async def hard_delete_file(
     """
 
     try:
-        storage = StorageFactory.get_storage(
-            settings.STORAGE_TYPE, settings.STORAGE_BUCKET_NAME
-        )
+        storage = StorageFactory.get_storage(settings.STORAGE_TYPE, settings.STORAGE_BUCKET_NAME)
         file_metadata = await get_file_by_name_and_destination_for_hard_delete(
             db=db, file_name=file_name, destination=destination
         )
         if not file_metadata:
-            logger.error(f"File {file_name} not found for delete.")
+            logger.warning(f"File {file_name} not found for delete.")
             return DeleteFileEnum.FILE_NOT_FOUND
 
         await db.delete(file_metadata)
@@ -97,6 +93,7 @@ async def hard_delete_file(
 
     try:
         name = f"{os.path.splitext(file_name)[0]}_{file_metadata.version}{os.path.splitext(file_name)[1]}"
+        print(f"Deleting file {name} from storage at {destination}")
         await storage.delete(name=name, destination=destination)
         logger.info(f"File {file_name} deleted permanently.")
     except Exception as err:

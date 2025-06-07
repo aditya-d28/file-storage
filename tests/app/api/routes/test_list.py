@@ -1,8 +1,9 @@
-import pytest
 from unittest import mock
-from fastapi.testclient import TestClient
-from fastapi import FastAPI
+
+import pytest
 from app.api.routes import list as list_route
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
 
 @pytest.fixture
@@ -34,18 +35,8 @@ def mock_get_db():
 def test_list_files_success(client, mock_get_file_list, monkeypatch):
     # Mock return value with correct model fields
     mock_get_file_list.return_value = [
-        {
-            "fileName": "file1.txt",
-            "fileSize": 1234,
-            "destination": "test",
-            "updatedAt": "2024-01-01T00:00:00Z"
-        },
-        {
-            "fileName": "file2.txt",
-            "fileSize": 5678,
-            "destination": "test",
-            "updatedAt": "2024-01-01T00:00:00Z"
-        }
+        {"fileName": "file1.txt", "fileSize": 1234, "destination": "test", "updatedAt": "2024-01-01T00:00:00Z"},
+        {"fileName": "file2.txt", "fileSize": 5678, "destination": "test", "updatedAt": "2024-01-01T00:00:00Z"},
     ]
 
     # Patch get_db dependency to avoid DB access
@@ -58,17 +49,12 @@ def test_list_files_success(client, mock_get_file_list, monkeypatch):
 
 
 def test_list_files_with_query_params(client, mock_get_file_list, monkeypatch):
-    mock_get_file_list.return_value = [{
-        "fileName": "fileA.txt",
-        "fileSize": 1234,
-        "destination": "docs",
-        "updatedAt": "2024-01-01T00:00:00Z"
-    }]
+    mock_get_file_list.return_value = [
+        {"fileName": "fileA.txt", "fileSize": 1234, "destination": "docs", "updatedAt": "2024-01-01T00:00:00Z"}
+    ]
     monkeypatch.setattr(list_route, "get_db", lambda: mock.AsyncMock())
 
-    response = client.get(
-        "/files?order_by_name=true&destination=docs&tag=important&verbose=true"
-    )
+    response = client.get("/files?order_by_name=true&destination=docs&tag=important&verbose=true")
     assert response.status_code == 200
     assert response.json()[0]["fileName"] == "fileA.txt"
     mock_get_file_list.assert_called_once()
@@ -84,6 +70,6 @@ def test_list_files_error(client, mock_get_file_list, monkeypatch):
     monkeypatch.setattr(list_route, "get_db", lambda: mock.AsyncMock())
 
     response = client.get("/files")
-    assert response.status_code == 200
-    assert "error" in response.json()
-    assert response.json()["error"] == "DB error"
+    assert response.status_code == 500
+    assert "detail" in response.json()
+    assert response.json()["detail"] == "Error retrieving file list."

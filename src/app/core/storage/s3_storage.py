@@ -57,9 +57,7 @@ class S3Storage(StorageBase):
                 logger.error(f"Error occurred: {err}")
                 raise Exception(f"Failed to create bucket '{bucket_name}': {err}")
 
-    async def upload(
-        self, name: str, file: UploadFile, destination: str
-    ) -> StorageUploadResponseModel:
+    async def upload(self, name: str, file: UploadFile, destination: str) -> StorageUploadResponseModel:
         """
         Asynchronously uploads a file to an S3 bucket at the specified destination.
 
@@ -77,12 +75,8 @@ class S3Storage(StorageBase):
         """
 
         try:
-            self.s3_client.upload_fileobj(
-                file.file, self.bucket_name, f"{destination}/{name}"
-            )
-            file_details = self.s3_client.head_object(
-                Bucket=self.bucket_name, Key=f"{destination}/{name}"
-            )
+            self.s3_client.upload_fileobj(file.file, self.bucket_name, f"{destination}/{name}")
+            file_details = self.s3_client.head_object(Bucket=self.bucket_name, Key=f"{destination}/{name}")
 
             response = StorageUploadResponseModel(
                 file_path=f"s3://{self.bucket_name}/{destination}/{name}",
@@ -106,9 +100,7 @@ class S3Storage(StorageBase):
         """
 
         try:
-            self.s3_client.delete_object(
-                Bucket=self.bucket_name, Key=f"{destination}/{name}"
-            )
+            self.s3_client.delete_object(Bucket=self.bucket_name, Key=f"{destination}/{name}")
             logger.debug(f"File deleted from S3: {name}")
         except ClientError as err:
             logger.error(f"Failed to delete file from S3: {err}")

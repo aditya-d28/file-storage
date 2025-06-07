@@ -1,8 +1,8 @@
-import pytest
-from unittest.mock import AsyncMock, patch, MagicMock
-from app.model.enum import DeleteFileEnum
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import app.service.delete_service as delete_service
+import pytest
+from app.model.enum import DeleteFileEnum
 
 
 @pytest.mark.asyncio
@@ -27,14 +27,10 @@ async def test_hard_delete_file_success(mock_get_file, mock_storage_factory):
     result = await delete_service.hard_delete_file(db, file_name, destination)
 
     # Assert
-    mock_get_file.assert_awaited_once_with(
-        db=db, file_name=file_name, destination=destination
-    )
+    mock_get_file.assert_awaited_once_with(db=db, file_name=file_name, destination=destination)
     db.delete.assert_awaited_once_with(file_metadata)
     db.commit.assert_awaited_once()
-    mock_storage.delete.assert_awaited_once_with(
-        name="test_2.txt", destination=destination
-    )
+    mock_storage.delete.assert_awaited_once_with(name="test_2.txt", destination=destination)
     assert result == DeleteFileEnum.DELETED
 
 
@@ -121,9 +117,7 @@ async def test_soft_delete_file_success(mock_update, mock_get_file):
     result = await delete_service.soft_delete_file(db, file_name, destination)
 
     # Assert
-    mock_get_file.assert_awaited_once_with(
-        db=db, file_name=file_name, destination=destination
-    )
+    mock_get_file.assert_awaited_once_with(db=db, file_name=file_name, destination=destination)
     assert file_metadata.is_deleted is True
     mock_update.assert_awaited_once_with(db, file_metadata)
     assert result == DeleteFileEnum.DELETED
@@ -143,9 +137,7 @@ async def test_soft_delete_file_not_found(mock_get_file):
 
     # Assert
     assert result == DeleteFileEnum.FILE_NOT_FOUND
-    mock_get_file.assert_awaited_once_with(
-        db=db, file_name=file_name, destination=destination
-    )
+    mock_get_file.assert_awaited_once_with(db=db, file_name=file_name, destination=destination)
 
 
 @pytest.mark.asyncio
@@ -165,8 +157,6 @@ async def test_soft_delete_file_db_exception(mock_update, mock_get_file):
 
     # Assert
     assert result == DeleteFileEnum.ERROR
-    mock_get_file.assert_awaited_once_with(
-        db=db, file_name=file_name, destination=destination
-    )
+    mock_get_file.assert_awaited_once_with(db=db, file_name=file_name, destination=destination)
     assert file_metadata.is_deleted is True
     mock_update.assert_awaited_once_with(db, file_metadata)

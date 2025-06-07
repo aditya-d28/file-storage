@@ -43,27 +43,21 @@ async def upload_file_to_storage(
         Exception: If the file upload or metadata saving fails.
     """
 
-    storage = StorageFactory.get_storage(
-        settings.STORAGE_TYPE, settings.STORAGE_BUCKET_NAME
-    )
+    storage = StorageFactory.get_storage(settings.STORAGE_TYPE, settings.STORAGE_BUCKET_NAME)
     version = int(time.time())
     name_versioned = f"{os.path.splitext(name)[0]}_{version}{os.path.splitext(name)[1]}"
     destination = destination.strip("/")
 
     try:
         logger.info(f"Uploading file: {name_versioned} to {destination}")
-        upload_details = await storage.upload(
-            name=name_versioned, file=file, destination=destination
-        )
-        logger.info(f"File uploaded successfully: {name_versioned}")
+        upload_details = await storage.upload(name=name_versioned, file=file, destination=destination)
+        logger.info(f"File uploaded to storage: {name_versioned}")
     except Exception as err:
         logger.error(f"Error uploading file: {err}")
         raise Exception(f"Failed to upload file: {err}")
 
     try:
-        file_metadata = await get_file_by_name_and_destination(
-            db=db, file_name=name, destination=destination
-        )
+        file_metadata = await get_file_by_name_and_destination(db=db, file_name=name, destination=destination)
         if file_metadata:
             print(upload_details)
             file_metadata.file_path = upload_details.file_path
@@ -97,5 +91,9 @@ async def upload_file_to_storage(
         )
     except Exception as err:
         logger.error(f"Error saving file metadata: {err}")
-        await storage.delete(upload_details.file_path)
+        try:
+            logger.debug(f"Deleting file: {name_versioned} from {destination}")
+            await storage.delete(name=name_versioned, destination=destination)
+        except Exception as delete_err:
+            logger.debug(f"Error deleting file after metadata save failure: {delete_err}")
         raise Exception(f"Failed to save file metadata: {err}")

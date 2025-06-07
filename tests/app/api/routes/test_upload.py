@@ -1,10 +1,10 @@
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
-from fastapi import status
-from fastapi.testclient import TestClient
-from unittest.mock import AsyncMock, patch, MagicMock
 from app.api.routes.upload import router
 from app.model.upload_model import FileDetailsModel
-from fastapi import FastAPI
+from fastapi import FastAPI, status
+from fastapi.testclient import TestClient
 
 app = FastAPI()
 app.include_router(router)
@@ -32,9 +32,7 @@ def file_details_model():
 
 @patch("app.api.routes.upload.upload_file_to_storage", new_callable=AsyncMock)
 @patch("app.api.routes.upload.get_db")
-def test_upload_file_success(
-    mock_get_db, mock_upload_file_to_storage, client, file_details_model, mock_db
-):
+def test_upload_file_success(mock_get_db, mock_upload_file_to_storage, client, file_details_model, mock_db):
     mock_get_db.return_value = mock_db
     mock_upload_file_to_storage.return_value = file_details_model
 
@@ -66,6 +64,6 @@ def test_upload_file_error(mock_get_db, mock_upload_file_to_storage, client, moc
             data={"destination": "", "tags": "", "description": ""},
         )
 
-    assert response.status_code == status.HTTP_200_OK
-    assert "error" in response.json()
-    assert response.json()["error"] == "Upload failed"
+    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+    assert "detail" in response.json()
+    assert "Error uploading file" in response.json()["detail"]

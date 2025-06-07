@@ -33,8 +33,6 @@ class StorageFactory:
                 region_name=settings.STORAGE_REGION_NAME,
             )
         elif storage_type == "gcs":
-            return GoogleCloudStorage(
-                bucket_name=bucket_name, location=settings.STORAGE_GCS_LOCATION
-            )
+            return GoogleCloudStorage(bucket_name=bucket_name, location=settings.STORAGE_GCS_LOCATION)
         else:
             raise ValueError(f"Unknown storage type: {storage_type}")

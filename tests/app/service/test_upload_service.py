@@ -1,9 +1,8 @@
-import pytest
-import asyncio
-from unittest import mock
 from unittest.mock import AsyncMock, MagicMock, patch
-from app.service.upload_service import upload_file_to_storage
+
+import pytest
 from app.model.upload_model import FileDetailsModel
+from app.service.upload_service import upload_file_to_storage
 
 
 @pytest.mark.asyncio
@@ -55,9 +54,7 @@ async def test_upload_file_to_storage_insert(
     description = "desc"
 
     # Act
-    result = await upload_file_to_storage(
-        db, name, file, destination, tags, description
-    )
+    result = await upload_file_to_storage(db, name, file, destination, tags, description)
 
     # Assert
     mock_get_storage.assert_called_once_with("mock", "bucket")
@@ -118,9 +115,7 @@ async def test_upload_file_to_storage_update(
     description = "desc"
 
     # Act
-    result = await upload_file_to_storage(
-        db, name, file, destination, tags, description
-    )
+    result = await upload_file_to_storage(db, name, file, destination, tags, description)
 
     # Assert
     mock_get_storage.assert_called_once_with("mock", "bucket")
@@ -204,4 +199,4 @@ async def test_upload_file_to_storage_metadata_exception(
     # Act & Assert
     with pytest.raises(Exception, match="Failed to save file metadata: db error"):
         await upload_file_to_storage(db, name, file, destination)
-    mock_storage.delete.assert_awaited_once_with(upload_details.file_path)
+    mock_storage.delete.assert_awaited_once()

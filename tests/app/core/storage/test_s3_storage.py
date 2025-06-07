@@ -1,9 +1,10 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
 from app.core.storage.s3_storage import S3Storage
 from app.model.upload_model import StorageUploadResponseModel
-from fastapi import UploadFile
 from botocore.exceptions import ClientError
+from fastapi import UploadFile
 
 
 @pytest.fixture
@@ -42,12 +43,8 @@ async def test_upload_file_success(s3_storage, s3_client_mock):
     result = await s3_storage.upload("test.txt", file_mock, "test-folder")
 
     # Assert
-    s3_client_mock.upload_fileobj.assert_called_once_with(
-        file_mock.file, "test-bucket", "test-folder/test.txt"
-    )
-    s3_client_mock.head_object.assert_called_once_with(
-        Bucket="test-bucket", Key="test-folder/test.txt"
-    )
+    s3_client_mock.upload_fileobj.assert_called_once_with(file_mock.file, "test-bucket", "test-folder/test.txt")
+    s3_client_mock.head_object.assert_called_once_with(Bucket="test-bucket", Key="test-folder/test.txt")
     assert isinstance(result, StorageUploadResponseModel)
     assert result.file_size == 1234
     assert result.file_type == "text/plain"
@@ -75,9 +72,7 @@ async def test_delete_file_success(s3_storage, s3_client_mock):
     await s3_storage.delete("test.txt", "test-folder")
 
     # Assert
-    s3_client_mock.delete_object.assert_called_once_with(
-        Bucket="test-bucket", Key="test-folder/test.txt"
-    )
+    s3_client_mock.delete_object.assert_called_once_with(Bucket="test-bucket", Key="test-folder/test.txt")
 
 
 @pytest.mark.asyncio
@@ -95,7 +90,7 @@ async def test_delete_file_client_error(s3_storage, s3_client_mock):
 
 def test_init_bucket_exists(s3_client_mock):
     # Arrange & Act
-    storage = S3Storage(
+    S3Storage(
         bucket_name="existing-bucket",
         endpoint_url="http://localhost:9000",
         aws_access_key_id="test-key",
@@ -116,7 +111,7 @@ def test_init_create_bucket(s3_client_mock):
     )
 
     # Act
-    storage = S3Storage(
+    S3Storage(
         bucket_name="new-bucket",
         endpoint_url="http://localhost:9000",
         aws_access_key_id="test-key",

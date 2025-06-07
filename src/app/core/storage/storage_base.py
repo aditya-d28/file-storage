@@ -6,9 +6,7 @@ from fastapi import UploadFile
 
 class StorageBase(ABC):
     @abstractmethod
-    def upload(
-        self, name: str, file: UploadFile, destination: str
-    ) -> StorageUploadResponseModel:
+    def upload(self, name: str, file: UploadFile, destination: str) -> StorageUploadResponseModel:
         pass
 
     @abstractmethod
