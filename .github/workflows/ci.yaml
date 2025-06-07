@@ -38,23 +38,27 @@ jobs:
 
       - name: Run format check
         run: |
-          poe format-check
+          poetry run poe format-check
 
       - name: Run import check
         run: |
-          poe import-check
+          poetry run poe import-check
 
       - name: Run whitespace check
         run: |
-          poe whitespace-check
+          poetry run poe whitespace-check
 
       - name: Run lint check
         run: |
-          poe lint-check
+          poetry run poe lint-check
 
       - name: Run unit tests
         run: |
-          poe unit-tests
+          poetry run poe unit-tests
+
+      - name: Check coverage threshold
+        run: |
+          coverage report --fail-under=85
 
       - name: Build the project
         run: |
