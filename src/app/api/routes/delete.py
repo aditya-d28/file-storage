@@ -1,0 +1,56 @@
+from app.core.database.db_config import get_db
+from app.model.enum import DeleteFileEnum
+from app.service.delete_service import hard_delete_file, soft_delete_file
+from fastapi import APIRouter, Depends, Path, Query
+from shared.logging.logger import get_logger
+from sqlalchemy.ext.asyncio import AsyncSession
+
+router = APIRouter()
+logger = get_logger("system")
+
+
+@router.delete("/file/{name}", summary="Deletes a file from the file-storage server.")
+async def delete_file(
+    name: str = Path(..., description="Name of the file to delete"),
+    destination: str = Query("", description="Destination of the file"),
+    delete_permanently: bool = Query(False, description="Delete file permanently"),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """
+    Deletes a file either permanently or via soft delete.
+
+    Args:
+        name (str): Name of the file to delete (from path parameter).
+        destination (str, optional): Destination directory of the file. Defaults to "".
+        delete_permanently (bool, optional): If True, deletes the file permanently; otherwise, performs a soft delete. Defaults to False.
+        db (AsyncSession): Database session (injected by FastAPI).
+
+    Returns:
+        dict: A dictionary containing either a success message or an error message.
+
+    Notes:
+        - If the file is not found, returns an error message.
+        - Logs actions and errors using the logger.
+    """
+
+    destination = destination.strip("/")
+    if delete_permanently:
+        response = await hard_delete_file(db, file_name=name, destination=destination)
+        if response == DeleteFileEnum.FILE_NOT_FOUND:
+            logger.error(f"File {name} not found.")
+            return {"error": f"File {name} does not exist."}
+        elif response == DeleteFileEnum.ERROR:
+            logger.error(f"Error deleting file {name} permanently.")
+            return {"error": f"Error deleting file {name} permanently."}
+        logger.info(f"File {name} deleted permanently.")
+        return {"message": f"File {name} deleted permanently."}
+    else:
+        response = await soft_delete_file(db, file_name=name, destination=destination)
+        if response == DeleteFileEnum.FILE_NOT_FOUND:
+            logger.error(f"File {name} not found.")
+            return {"error": f"File {name} does not exist."}
+        elif response == DeleteFileEnum.ERROR:
+            logger.error(f"Error deleting file {name}.")
+            return {"error": f"Error deleting file {name}."}
+        logger.info(f"File {name} deleted.")
+        return {"message": f"File {name} deleted."}

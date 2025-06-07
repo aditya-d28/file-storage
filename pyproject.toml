@@ -1,0 +1,54 @@
+[tool.poetry]
+name = "file-storage"
+version = "0.1.0"
+description = ""
+authors = ["aditya-d28 <adiitkgp28@gmail.com>"]
+readme = "README.md"
+packages = [
+  { include = "app", from = "src" },
+  { include = "cli", from = "src" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+requests = "^2.32.3"
+fastapi = "^0.115.12"
+uvicorn = "^0.34.3"
+pydantic = "^2.11.5"
+pydantic-settings = "^2.9.1"
+starlette-context = "^0.4.0"
+python-multipart = "^0.0.20"
+colored = "^2.3.0"
+colorlog = "^6.9.0"
+typer = "^0.16.0"
+poethepoet = "^0.34.0"
+pyright = "^1.1.401"
+asyncpg = "^0.30.0"
+greenlet = "^3.2.2"
+psycopg2-binary = "^2.9.10"
+boto3 = "^1.38.29"
+httpx = "^0.28.1"
+google-cloud-storage = "^2.18.0"
+
+[tool.poetry.group.dev.dependencies]
+alembic = "^1.16.1"
+pytest = "^8.4.0"
+pytest-asyncio = "^1.0.0"
+pytest-mock = "^3.14.1"
+pytest-cov = "^6.1.1"
+
+[tool.poetry.scripts]
+fs-store = "cli.main:app"
+fs-store-up = "app.main:run_backend()"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poe.tasks]
+format-check = "ruff format --check ."
+import-check = "ruff check --select \"I\" --select \"F401\" ."
+whitespace-check = "ruff check --select \"W291,W292,W293\" ."
+lint-check = "ruff check --ignore \"I,F401,W291,W292,W293\" ."
+type-check = "pyright ."
+unit-tests = "pytest --verbose --cov=. --cov-report=term-missing --cov-config=.coveragerc tests"

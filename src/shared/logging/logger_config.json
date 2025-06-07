@@ -1,0 +1,49 @@
+{
+    "version": 1,
+    "disable_existing_loggers": false,
+    "formatters": {
+        "detailed": {
+            "format": "%(levelname)s - %(asctime)s - %(message)s - File: %(filename)s Line: %(lineno)d Function: %(funcName)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S"
+        },
+        "colored": {
+            "class": "colorlog.ColoredFormatter",
+            "format": "%(log_color)s%(levelname)s%(reset)s - %(thin_green)s%(asctime)s%(reset)s - %(bold_white)s%(message)s%(reset)s - File: %(blue)s%(filename)s%(reset)s Line: %(blue)s%(lineno)d%(reset)s Function: %(funcName)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+            "log_colors": {
+                "DEBUG": "bold_white",
+                "INFO": "bold_green",
+                "WARNING": "bold_yellow",
+                "ERROR": "bold_red",
+                "CRITICAL": "bold_purple"
+            },
+            "secondary_log_colors": {
+                "asctime": "thin_green",
+                "filename": "blue",
+                "lineno": "blue"
+            },
+            "style": "%"
+        }
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "colored",
+            "level": "DEBUG"
+        },
+        "file": {
+            "class": "logging.FileHandler",
+            "formatter": "detailed",
+            "level": "DEBUG",
+            "filename": "app.log",
+            "mode": "a"
+        }
+    },
+    "loggers": {
+        "": {
+            "level": "DEBUG",
+            "handlers": ["console", "file"],
+            "propagate": true
+        }
+    }
+}

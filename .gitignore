@@ -1,0 +1,30 @@
+# Python
+**/__pycache__/
+*/**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.env
+.venv
+env/
+venv/
+ENV/
+.ruff_cache/
+dist/
+
+# Editor directories and files
+.idea
+.vscode
+*.swp
+*.swo
+
+# Application specific
+uploaded_files/
+*.log
+.coverage
+htmlcov/
+.pytest_cache/
+
+# macOS
+.DS_Store
