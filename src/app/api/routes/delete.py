@@ -18,20 +18,20 @@ async def delete_file(
     db: AsyncSession = Depends(get_db),
 ) -> dict:
     """
-    Deletes a file either permanently or via soft delete.
-
+    Deletes a file either permanently or by soft deletion.
     Args:
         name (str): Name of the file to delete (from path parameter).
-        destination (str, optional): Destination directory of the file. Defaults to "".
+        destination (str, optional): Destination directory of the file (from query parameter). Defaults to "".
         delete_permanently (bool, optional): If True, deletes the file permanently; otherwise, performs a soft delete. Defaults to False.
-        db (AsyncSession): Database session (injected by FastAPI).
+        db (AsyncSession): Database session dependency.
 
     Returns:
-        dict: A dictionary containing either a success message or an error message.
+        dict: A message indicating the result of the deletion operation.
 
-    Notes:
-        - If the file is not found, returns an error message.
-        - Logs actions and errors using the logger.
+    Raises:
+        HTTPException:
+            - 404 if the file is not found.
+            - 500 if there is an error during the deletion process.
     """
 
     destination = destination.strip("/")
