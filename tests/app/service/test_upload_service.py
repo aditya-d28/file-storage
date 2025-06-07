@@ -1,3 +1,21 @@
+import os
+
+# Set required environment variables before any app imports
+os.environ["PROJECT_NAME"] = "test_project"
+os.environ["CONSOLE_LOG_LEVEL"] = "INFO"
+os.environ["FILE_LOG_LEVEL"] = "INFO"
+os.environ["DEV_MODE"] = "True"
+os.environ["DB_TYPE"] = "sqlite"
+os.environ["DB_HOST"] = "localhost"
+os.environ["DB_PORT"] = "5432"
+os.environ["DB_NAME"] = "test_db"
+os.environ["DB_USER"] = "user"
+os.environ["DB_PASSWORD"] = "password"
+os.environ["DB_POOL_SIZE"] = "5"
+os.environ["DB_MAX_OVERFLOW"] = "10"
+os.environ["STORAGE_TYPE"] = "mock"
+os.environ["STORAGE_BUCKET_NAME"] = "bucket"
+
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -24,6 +42,7 @@ async def test_upload_file_to_storage_insert(
     mock_insert,
     mock_get_file_by_name_and_destination,
     mock_get_storage,
+    monkeypatch,
 ):
     # Arrange
     mock_settings.STORAGE_TYPE = "mock"
@@ -87,6 +106,7 @@ async def test_upload_file_to_storage_update(
     mock_insert,
     mock_get_file_by_name_and_destination,
     mock_get_storage,
+    monkeypatch,
 ):
     # Arrange
     mock_settings.STORAGE_TYPE = "mock"
@@ -136,10 +156,7 @@ async def test_upload_file_to_storage_update(
 @patch("app.service.upload_service.settings")
 @patch("time.time", return_value=1234567890)
 async def test_upload_file_to_storage_upload_exception(
-    mock_time,
-    mock_settings,
-    mock_logger,
-    mock_get_storage,
+    mock_time, mock_settings, mock_logger, mock_get_storage, monkeypatch
 ):
     # Arrange
     mock_settings.STORAGE_TYPE = "mock"
@@ -176,6 +193,7 @@ async def test_upload_file_to_storage_metadata_exception(
     mock_insert,
     mock_get_file_by_name_and_destination,
     mock_get_storage,
+    monkeypatch,
 ):
     # Arrange
     mock_settings.STORAGE_TYPE = "mock"

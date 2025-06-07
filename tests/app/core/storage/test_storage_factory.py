@@ -1,3 +1,21 @@
+import os
+
+# Set required environment variables before any app imports
+os.environ["PROJECT_NAME"] = "test_project"
+os.environ["CONSOLE_LOG_LEVEL"] = "INFO"
+os.environ["FILE_LOG_LEVEL"] = "INFO"
+os.environ["DEV_MODE"] = "True"
+os.environ["DB_TYPE"] = "sqlite"
+os.environ["DB_HOST"] = "localhost"
+os.environ["DB_PORT"] = "5432"
+os.environ["DB_NAME"] = "test_db"
+os.environ["DB_USER"] = "user"
+os.environ["DB_PASSWORD"] = "password"
+os.environ["DB_POOL_SIZE"] = "5"
+os.environ["DB_MAX_OVERFLOW"] = "10"
+os.environ["STORAGE_TYPE"] = "mock"
+os.environ["STORAGE_BUCKET_NAME"] = "bucket"
+
 from unittest import mock
 
 import pytest
