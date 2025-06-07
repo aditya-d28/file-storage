@@ -58,7 +58,7 @@ jobs:
 
       - name: Check coverage threshold
         run: |
-          coverage report --fail-under=85
+          poetry run coverage report --fail-under=85
 
       - name: Build the project
         run: |
