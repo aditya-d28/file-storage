@@ -45,8 +45,16 @@ def upgrade() -> None:
         sa.Column("user_id", sa.String, nullable=False),
         sa.Column("is_deleted", sa.Boolean, nullable=False, default=False),
     )
+    op.create_index('ix_file_metadata_file_name', 'file_metadata', ['file_name'])
+    op.create_index('ix_file_metadata_file_size', 'file_metadata', ['file_size'])
+    op.create_index('ix_file_metadata_destination', 'file_metadata', ['destination'])
+    op.create_index('ix_file_metadata_updated_at', 'file_metadata', ['updated_at'])
 
 
 def downgrade() -> None:
     """Downgrade schema."""
+    op.drop_index('ix_file_metadata_file_name', table_name='file_metadata')
+    op.drop_index('ix_file_metadata_file_size', table_name='file_metadata')
+    op.drop_index('ix_file_metadata_destination', table_name='file_metadata')
+    op.drop_index('ix_file_metadata_updated_at', table_name='file_metadata')
     op.drop_table("file_metadata")

@@ -10,11 +10,18 @@
         - [Local Installation](#local-installation)
         - [CLI Installation](#cli-installation)
         - [Testing and format checks](#testing-and-format-checks)
+        - [CI Automation (GitHub Actions)](#ci-automation-github-actions)
     - [Accessing the Server](#accessing-the-server)
         - [RESTful APIs](#restful-apis)
         - [Command Line Interface (CLI)](#command-line-interface-cli)
     - [Configurations](#configurations)
     - [Project Structure](#project-structure)
+    - [Design Overview](#design-overview)
+        - [Storage Backend](#storage-backend)
+        - [Metadata Management](#metadata-management)
+        - [CLI Design](#cli-design)
+        - [Reliability and Consistency](#reliability-and-consistency)
+    - [Future Scope](#future-scope)
 
 
 ## Overview
@@ -34,7 +41,7 @@ The File Storage Service is a Python-based application built with FastAPI, desig
 - **Configurable Storage Options**: Supports Amazon S3, Google Cloud Storage, and local file storage.
 
 ## Getting Started
-
+**Note: This application and CLI has been created and tested in macOS, may not work as expected in Windows and Linux.**
 ### Prerequisites
 
 To run the File Storage server and CLI efficiently, the following are required:
@@ -48,11 +55,16 @@ To run the File Storage server and CLI efficiently, the following are required:
 For an easier and quicker installation, it is recommended to use Docker. Before installation, it is important to create a configuration file, please check [Configuration](#configuration) section for more details. To install the application using Docker, run the following command (ensure that the Docker daemon is up and running):
 
 ``` sh
-docker compose up --build
+docker compose up --build -d
 ```
 This will start the application container along with PostgreSQL and a MinIO container, which are used by the backend of the application. Once the server is up and running, you can access the API endpoints at the configured host and port (defaults to `http://localhost:8080`).
 
 You can use the Swagger UI at `{your_api_url}/doc` or Postman to make API calls to the server.
+
+To stop the server run command:
+``` sh
+docker compose down
+```
 
 ### Local Installation
 
@@ -81,7 +93,7 @@ The CLI for this tool can be installed using the wheel file located in the `dist
 ``` sh
 pip install dist/file_storage-0.1.0-py3-none-any.whl 
 ```
-To verify the installation, run the following command:
+To verify the installation, run the following command (ensure appropriate PATH variables are set):
 ``` sh
 fs-store -v
 ```
@@ -124,6 +136,21 @@ The commands mentioned above should be executed within the `poetry shell`. To ac
 poetry shell
 ```
 Once inside the Poetry shell, you can execute the commands for unit tests, formatting checks, and linting as outlined earlier.
+
+### CI Automation (GitHub Actions)
+
+In this project a GitHub Actions workflow has been added to enforce quality and automate releases. The workflow (in `.github/workflows/ci.yml`) runs on every push and pull-request. (It was tested in a **private** GitHub repository to verify correctness.)
+
+- **Format & Import Checks**  
+  Runs `poe import-check`, `poe format-check` and `poe whitespace-check` to ensure consistent code style.
+- **Linting**  
+  Runs `poe lint-check` to catch potential errors and enforce best practices.
+- **Unit Tests & Coverage**  
+  Runs `poe unit-tests` and fails if coverage drops below 90%.
+- **Build CLI Package**  
+  Builds the wheel (`python -m build`) and validates that `dist/` contains the CLI distribution.
+
+This CI pipeline gives immediate feedback on formatting, linting, test results, and package build status before any merge.
 
 ## Accessing the Server
 There are two ways to interact with the server of this application: through **RESTful APIs** and the **Command Line Interface (CLI)**. Below are the details for using both methods:
@@ -414,7 +441,7 @@ fs-store list-files --help
 |                 | DB_MAX_OVERFLOW                | Maximum overflow connections above pool size                            | 20                        |
 | **File Storage**| STORAGE_TYPE                   | Type of storage backend (s3, gcs, local)                                | s3                        |
 |                 | STORAGE_BUCKET_NAME            | Name of the storage bucket                                              | temp                      |
-| **AWS S3**      | S3_ENDPOINT_URL                | S3-compatible endpoint URL                                              | "http://localhost:9000"   |
+| **AWS S3**      | S3_ENDPOINT_URL                | S3-compatible endpoint URL                                              | "http://minio:9000"   |
 |                 | STORAGE_AWS_ACCESS_KEY_ID      | AWS access key ID                                                       | minioadmin                |
 |                 | STORAGE_AWS_SECRET_ACCESS_KEY  | AWS secret access key                                                   | minioadmin123             |
 |                 | STORAGE_REGION_NAME            | AWS region name                                                         | us-east-1                 |
@@ -444,3 +471,47 @@ This section outlines the important directories and files in the project.
 ├── .env                    # Configurations
 ├── README.md               # Readme file
 ```
+
+## Design Overview
+
+### Storage Backend
+
+**Amazon S3** is used as the primary storage solution for its proven scalability, high durability, and wide ecosystem support. For local development and testing, a **MinIO** container is spin up, which simulates S3-like behavior and is fully compatible with the AWS SDK. To keep the codebase flexible, all storage implementations (S3, MinIO, Google Cloud Storage, and local filesystem) conform to a common interface via a **factory pattern**. At startup, the factory reads the `STORAGE_TYPE` setting and instantiates the matching client—making it trivial to add new backends or swap providers without touching business logic.
+
+
+### Metadata Management
+
+In this project, **PostgreSQL** was chosen for file metadata because of its ACID guarantees, robust indexing, and mature tooling. And **Alembic** is used for all schema migrations—so every change is versioned, rollback-able, and reproducible. To optimize query performance, indexes were created on frequently filtered and sorted columns (e.g. `file_name`, `file_size`, `destination`, `updated_at`) in the Alembic migration. SQLAlchemy handles the ORM layer, and Alembic ensures our schema (tables + indexes) stays in sync across environments.
+
+### CLI Design
+
+The CLI issues **HTTP calls** to the REST API rather than invoking service-layer functions directly. This clear separation of concerns means:
+- **Server** owns all validation and business rules  
+- **CLI** focuses on user interaction and orchestration  
+- Ensures consistency between CLI and other HTTP clients  
+- Mirrors production usage, making automated and end-to-end tests straightforward
+
+### Reliability and Consistency
+
+File operations are implemented in two phases:
+
+1. **Upload to Storage**  
+   The file is first written to the configured storage backend.  
+2. **Persist Metadata**  
+   On successful upload, metadata is committed to the database.  
+
+If the metadata step fails, the uploaded file is either rolled back or flagged for cleanup, preventing orphaned blobs. Conversely, if storage fails, the database remains untouched.
+
+
+## Future Scope
+
+- **Enhanced Versioning**  
+  Right now a single `version` column tracks the latest iteration. In future, a dedicated `file_versions` table could store historical snapshots, enable rollbacks and support audit trails.
+
+- **Soft-Delete & Restore**  
+  The `is_deleted` flag currently allows “soft” deletions. A future `restore-file` endpoint could simply clear this flag to undelete a file.
+
+- **Automated Cleanup**  
+  A scheduled job (e.g. cron or Celery Beat) can periodically purge file versions (and metadata) older than a configurable retention period (e.g. 30 days), balancing storage costs with historical needs.
+
+----
