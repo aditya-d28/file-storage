@@ -26,7 +26,7 @@ def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
     openapi_schema = get_openapi(
-        title="IAC-Migration-Tool",
+        title="File-Storage-Tool",
         version="1.0.0",
         openapi_version="3.1.0",
         routes=app.routes,
